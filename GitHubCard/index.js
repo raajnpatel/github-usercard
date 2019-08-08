@@ -2,15 +2,30 @@
            (replacing the palceholder with your Github name):
            https://api.github.com/users/<your name>
 */
-function axiosGithub(username) {
+
+function axiosGithub(username){
     axios
         .get(`https://api.github.com/users/${username}`)
-        .then((response) => {
-        console.log(response.data);
-        return username;
-    }) .catch((error) => {
-        console.log(error);
-    });
+        .then(response => {
+            cardProfile(response.data);
+            return username;
+        })
+        .then(username =>{
+            axios
+                .get(`https://api.github.com/users/${username}/followers`)
+                .then(response=>{
+                    let friendList = response.data;
+                    friendList.forEach((obj)=>{
+                        cardProfile(obj);
+                    });
+                })
+                .catch(error=>{
+                    console.log(error);
+                });
+        })
+        .catch(error => {
+            console.log(error);
+        });
 }
 
 /* Step 2: Inspect and study the data coming back, this is YOUR 
@@ -56,14 +71,14 @@ const followersArray = [];
 
 */
 
-let cards = document.querySelector(".cards");
+let cardsDiv = document.querySelector(".cards");
 
-function cardReturn(obj) {
+function cardProfile(obj) {
     let cardDiv = document.createElement("div");
     cardDiv.classList.add("card");
 
     let cardAvatar = document.createElement("img");
-    cardAvatar.src = '#'; //ADD LATER
+    cardAvatar.src = obj.avatar_url;
 
     let cardInfo = document.createElement("div");
     cardInfo.classList.add("card-info");
@@ -72,12 +87,45 @@ function cardReturn(obj) {
     h3.classList.add("name");
     h3.textContent = obj.name;
 
-    let cardName = document.createElement("p");
-    cardName.classList.add("username");
-    cardName.textContent = obj.username;
+    let profileUserN = document.createElement("p");
+    profileUserN.classList.add("username");
+    profileUserN.textContent = obj.login;
 
-    let cardLocation = document.createElement("p");
-    cardLocation.textContent = `Location: ${obj.location}`;
+    let profileLocation = document.createElement("p");
+    profileLocation.textContent = `Location: ${obj.location}`;
+
+    let profileP = document.createElement("p");
+    profileP.textContent = `Profile:`;
+
+    let profileAnchor = document.createElement("a");
+    profileAnchor.href = obj.html_url;
+
+    let pFollowers = document.createElement("p");
+    pFollowers.textContent = `Followers: ${obj.followers}`;
+
+    let pFollowing = document.createElement("p");
+    pFollowing.textContent = `Following: ${obj.following}`;
+
+    let profileBio = document.createElement("p");
+    profileBio.textContent = `Bio: ${obj.bio}`;
+
+    cardsDiv.appendChild(cardDiv);
+
+    cardDiv.appendChild(cardAvatar);
+    cardDiv.appendChild(cardInfo);
+
+    profileP.appendChild(profileAnchor);
+
+    cardInfo.appendChild(h3);
+    cardInfo.appendChild(profileUserN);
+    cardInfo.appendChild(profileLocation);
+    cardInfo.appendChild(profileP);
+    cardInfo.appendChild(pFollowers);
+    cardInfo.appendChild(pFollowing);
+    cardInfo.appendChild(profileBio);
+
+
+
 
 }
 
@@ -88,3 +136,5 @@ function cardReturn(obj) {
   luishrd
   bigknell
 */
+// console.log(axiosGithub("raajnpatel"));
+axiosGithub("raajnpatel");
