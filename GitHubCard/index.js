@@ -3,6 +3,38 @@
            https://api.github.com/users/<your name>
 */
 
+function axiosGithub(username){
+    axios
+        .get(`https://api.github.com/users/${username}`)
+        .then(response => {
+            console.log(response.data);
+            cardProfile(response.data);
+            return username;
+        })
+        .then(username =>{
+            axios
+                .get(`https://api.github.com/users/${username}/followers`)
+                .then(response=>{
+                    let friendList = response.data;
+                    friendList.forEach((obj)=>{
+                        console.log(obj.login);
+                            axios
+                                .get(`https://api.github.com/users/${obj.login}`)
+                                .then(response => {
+                                    cardProfile(response.data);
+                                })
+                    });
+                })
+                .catch(error=>{
+                    console.log(error);
+                });
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
+}
+
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
    data in order to use it to build your component function 
@@ -46,6 +78,64 @@ const followersArray = [];
 
 */
 
+let cardsDiv = document.querySelector(".cards");
+
+function cardProfile(obj) {
+    let cardDiv = document.createElement("div");
+    cardDiv.classList.add("card");
+
+    let cardAvatar = document.createElement("img");
+    cardAvatar.src = obj.avatar_url;
+
+    let cardInfo = document.createElement("div");
+    cardInfo.classList.add("card-info");
+
+    let h3 = document.createElement("h3");
+    h3.classList.add("name");
+    h3.textContent = obj.name;
+
+    let profileUserN = document.createElement("p");
+    profileUserN.classList.add("username");
+    profileUserN.textContent = obj.login;
+
+    let profileLocation = document.createElement("p");
+    profileLocation.textContent = `Location: ${obj.location}`;
+
+    let profileP = document.createElement("p");
+    profileP.textContent = `Profile: ${obj.html_url}`;
+
+    let profileAnchor = document.createElement("a");
+    profileAnchor.href = obj.html_url;
+
+    let pFollowers = document.createElement("p");
+    pFollowers.textContent = `Followers: ${obj.followers}`;
+
+    let pFollowing = document.createElement("p");
+    pFollowing.textContent = `Following: ${obj.following}`;
+
+    let profileBio = document.createElement("p");
+    profileBio.textContent = `Bio: ${obj.bio}`;
+
+    cardsDiv.appendChild(cardDiv);
+
+    cardDiv.appendChild(cardAvatar);
+    cardDiv.appendChild(cardInfo);
+
+    profileP.appendChild(profileAnchor);
+
+    cardInfo.appendChild(h3);
+    cardInfo.appendChild(profileUserN);
+    cardInfo.appendChild(profileLocation);
+    cardInfo.appendChild(profileP);
+    cardInfo.appendChild(pFollowers);
+    cardInfo.appendChild(pFollowing);
+    cardInfo.appendChild(profileBio);
+
+
+
+
+}
+
 /* List of LS Instructors Github username's: 
   tetondan
   dustinmyers
@@ -53,3 +143,5 @@ const followersArray = [];
   luishrd
   bigknell
 */
+// console.log(axiosGithub("raajnpatel"));
+axiosGithub("raajnpatel");
