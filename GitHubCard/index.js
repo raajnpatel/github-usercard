@@ -7,6 +7,7 @@ function axiosGithub(username){
     axios
         .get(`https://api.github.com/users/${username}`)
         .then(response => {
+            console.log(response.data);
             cardProfile(response.data);
             return username;
         })
@@ -16,7 +17,12 @@ function axiosGithub(username){
                 .then(response=>{
                     let friendList = response.data;
                     friendList.forEach((obj)=>{
-                        cardProfile(obj);
+                        console.log(obj.login);
+                            axios
+                                .get(`https://api.github.com/users/${obj.login}`)
+                                .then(response => {
+                                    cardProfile(response.data);
+                                })
                     });
                 })
                 .catch(error=>{
@@ -26,6 +32,7 @@ function axiosGithub(username){
         .catch(error => {
             console.log(error);
         });
+
 }
 
 /* Step 2: Inspect and study the data coming back, this is YOUR 
@@ -95,7 +102,7 @@ function cardProfile(obj) {
     profileLocation.textContent = `Location: ${obj.location}`;
 
     let profileP = document.createElement("p");
-    profileP.textContent = `Profile:`;
+    profileP.textContent = `Profile: ${obj.html_url}`;
 
     let profileAnchor = document.createElement("a");
     profileAnchor.href = obj.html_url;
